@@ -1,0 +1,97 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.3.255.40792",
+      "templateHash": "9257910125094939611"
+    }
+  },
+  "parameters": {
+    "vnetName": {
+      "type": "string",
+      "defaultValue": "vnet"
+    },
+    "vnetPrefix": {
+      "type": "string",
+      "defaultValue": "172.16.0.0/22"
+    },
+    "subnet1Name": {
+      "type": "string",
+      "defaultValue": "first-subnet"
+    },
+    "subnet1Prefix": {
+      "type": "string",
+      "defaultValue": "172.16.1.0/24"
+    },
+    "subnet2Name": {
+      "type": "string",
+      "defaultValue": "second-subnet"
+    },
+    "subnet2Prefix": {
+      "type": "string",
+      "defaultValue": "172.16.2.0/24"
+    },
+    "routeTableid": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "object",
+      "defaultValue": {
+        "environment": "production",
+        "projectCode": "xyz"
+      }
+    }
+  },
+  "functions": [],
+  "resources": [
+    {
+      "type": "Microsoft.Network/virtualNetworks",
+      "apiVersion": "2019-12-01",
+      "name": "[parameters('vnetName')]",
+      "location": "[resourceGroup().location]",
+      "tags": "[parameters('tags')]",
+      "properties": {
+        "addressSpace": {
+          "addressPrefixes": [
+            "[parameters('vnetPrefix')]"
+          ]
+        },
+        "enableVmProtection": false,
+        "enableDdosProtection": false,
+        "subnets": [
+          {
+            "name": "[parameters('subnet1Name')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnet1Prefix')]",
+              "routeTable": {
+                "id": "[parameters('routeTableid')]"
+              }
+            }
+          },
+          {
+            "name": "[parameters('subnet2Name')]",
+            "properties": {
+              "addressPrefix": "[parameters('subnet2Prefix')]"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "outputs": {
+    "vnetID": {
+      "type": "string",
+      "value": "[resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))]"
+    },
+    "subnet1ID": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))).subnets[0].id]"
+    },
+    "subnet2ID": {
+      "type": "string",
+      "value": "[reference(resourceId('Microsoft.Network/virtualNetworks', parameters('vnetName'))).subnets[1].id]"
+    }
+  }
+}
