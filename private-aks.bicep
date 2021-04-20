@@ -82,9 +82,10 @@ module aksvnet './modules/vnet.bicep' = {
       {
         name: 'ingress-subnet'
         subnetPrefix: '192.168.6.0/24'
+        routeTableid: aksroutetable.outputs.routeTableid
       }
     ]
-    routeTableid: aksroutetable.outputs.routeTableid
+
   }
 }
 // Create the dev vnet
@@ -98,13 +99,14 @@ module devvnet './modules/vnet.bicep' = {
       {
         name: 'agents-subnet'
         subnetPrefix: '192.168.2.0/25'
+        routeTableid: devroutetable.outputs.routeTableid
       }
       {
         name: 'PE-subnet'
         subnetPrefix: '192.168.2.224/27'
       }
     ]
-    routeTableid: devroutetable.outputs.routeTableid
+    
   }
 }
 // Peer hub with aks vnets

@@ -5,16 +5,19 @@ param subnets array = [
   {
     name: 'subnet1'
     subnetPrefix: '172.16.0.0/24'
+    routeTableid: ''
   }
   {
     name: 'subnet2'
     subnetPrefix: '172.16.1.0/24'
+    routeTableid: ''
   }
   {
     name: 'subnet3'
     subnetPrefix: '172.16.2.0/24'
+    routeTableid: ''
   }
-] 
+]
 param tags object = {
   environment: 'production'
   projectCode: 'xyz'
@@ -37,11 +40,12 @@ resource vnet 'Microsoft.Network/virtualNetworks@2019-12-01' = {
       name:subnet.name
       properties:{
         addressPrefix:subnet.subnetPrefix
-        routeTable: 
+        routeTable: subnet.routeTableid
       }
     }]
   }
 }
+
 
 output vnetID string = vnet.id
 output subnet array = [for (subnet,i) in subnets:{
