@@ -40,7 +40,9 @@ resource vnet 'Microsoft.Network/virtualNetworks@2019-12-01' = {
       name:subnet.name
       properties:{
         addressPrefix:subnet.subnetPrefix
-        routeTable: subnet.routeTableid
+        routeTable: {
+          id: subnet.routeTableid
+        }
       }
     }]
   }

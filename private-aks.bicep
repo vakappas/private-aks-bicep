@@ -193,7 +193,7 @@ module akscluster './modules/aks-cluster.bicep' = {
   params: {
     tags: tags
     clusterName: clusterName
-    subnetID: aksvnet.outputs.subnet1ID
+    subnetID: aksvnet.outputs.subnet[0].id
     nodeResourceGroup: '${clusterName}-nodes-rg' 
   }
 }
@@ -235,7 +235,7 @@ module agentvm './modules/ubuntu-docker.bicep' = {
     location: location
     adminUsername: 'adminuser'
     adminPasswordOrKey: adminPasswordOrKey
-    subnetID: devvnet.outputs.subnet1ID
+    subnetID: devvnet.outputs.subnet[0].id
     authenticationType: 'password'
   }
 }
