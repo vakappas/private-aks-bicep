@@ -505,6 +505,9 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-05-01' = {
                 '*.oms.opinsights.azure.com'
                 '*.microsoftonline.com'
                 '*.monitoring.azure.com'
+                'api.snapcraft.io'
+                '*.agentsvc.azure-automation.net'
+                'md-0fz4cs3dgc1b.z37.blob.storage.azure.net'
               ]
 
             }
@@ -540,6 +543,7 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-05-01' = {
               targetFqdns:[
                 'download.opensuse.org'
                 'security.ubuntu.com'
+                'archieve.ubuntu.com'
                 'changelogs.ubuntu.com'
                 'azure.archive.ubuntu.com'
                 'ntp.ubuntu.com'
@@ -656,6 +660,7 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-05-01' = {
                 '*.github.com'
                 'github.com'
                 '*.s3.amazonaws.com'
+                '*.github.io'
               ]
 
             }
