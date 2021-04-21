@@ -30,9 +30,24 @@ param tags object = {
 }
 
 // vars
-// var nodeResourceGroup = '${dnsPrefix}-${clusterName}-rg'
-
 var nodePoolName = 'systempool'
+var aksLawsName = '${resourceGroup().name}-laws-${uniqueString(resourceGroup().id)}'
+
+
+// resources
+resource aks_workspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
+  name: aksLawsName
+  location: location
+  tags: tags
+  properties: {
+    sku: {
+      name: 'PerGB2018'
+    }
+    retentionInDays: 30
+    publicNetworkAccessForIngestion: 'Enabled'
+    publicNetworkAccessForQuery: 'Enabled'
+  }
+}
 
 // Create the Azure kubernetes service cluster
 resource aks 'Microsoft.ContainerService/managedClusters@2020-09-01' = {
@@ -68,6 +83,14 @@ resource aks 'Microsoft.ContainerService/managedClusters@2020-09-01' = {
     networkProfile: {
       networkPlugin: 'azure'
       loadBalancerSku: 'standard'
+    }
+    addonProfiles:{
+      omsagent:{
+        config:{
+          logAnalyticsWorkspaceResourceID: aks_workspace.id
+        }
+        enabled: true
+      }
     }
   }
 }

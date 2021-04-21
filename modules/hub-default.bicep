@@ -508,6 +508,10 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-05-01' = {
                 'api.snapcraft.io'
                 '*.agentsvc.azure-automation.net'
                 'md-0fz4cs3dgc1b.z37.blob.storage.azure.net'
+                'azurecliprod.blob.core.windows.net'
+                '3097d017-5d0e-452d-a367-e8f14ba6c9f7.agentsvc.azure-automation.net'
+                'vstsagentpackage.azureedge.net'
+                'cc-jobruntimedata-prod-su1.azure-automation.net'
               ]
 
             }
@@ -627,6 +631,28 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-05-01' = {
               ]
 
             }
+            {
+              name: 'Allow helm binaries'
+              description: 'Application Rule to allow access to helm binaries'
+              sourceAddresses: [
+                '*'
+              ]
+              protocols: [
+                {
+                  port: 80
+                  protocolType:'Http'              
+                }
+                {
+                  port: 443
+                  protocolType: 'Https'
+                }
+
+              ]
+              targetFqdns:[
+                'get.helm.sh'
+              ]
+
+            }
           ]
 
         }
@@ -661,6 +687,7 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-05-01' = {
                 'github.com'
                 '*.s3.amazonaws.com'
                 '*.github.io'
+                'github-releases.githubusercontent.com'
               ]
 
             }
