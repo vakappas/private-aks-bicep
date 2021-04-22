@@ -74,11 +74,19 @@ module aksvnet './modules/vnet.bicep' = {
   params: {
     vnetName: 'aks-vnet'
     vnetPrefix: '192.168.4.0/22'
-    subnet1Name: 'nodes-subnet'
-    subnet1Prefix: '192.168.4.0/23'
-    subnet2Name: 'ingress-subnet'
-    subnet2Prefix: '192.168.6.0/24'
-    routeTableid: aksroutetable.outputs.routeTableid
+    subnets: [
+      {
+        name: 'nodes-subnet'
+        subnetPrefix: '192.168.4.0/23'
+        routeTableid: aksroutetable.outputs.routeTableid
+      }
+      {
+        name: 'ingress-subnet'
+        subnetPrefix: '192.168.6.0/24'
+        routeTableid: ''
+      }
+    ]
+
   }
 }
 // Create the dev vnet
@@ -88,11 +96,19 @@ module devvnet './modules/vnet.bicep' = {
   params: {
     vnetName: 'dev-vnet'
     vnetPrefix: '192.168.2.0/24'
-    subnet1Name: 'agents-subnet'
-    subnet1Prefix: '192.168.2.0/25'
-    subnet2Name: 'PE-subnet'
-    subnet2Prefix: '192.168.2.224/27'
-    routeTableid: devroutetable.outputs.routeTableid
+    subnets: [
+      {
+        name: 'agents-subnet'
+        subnetPrefix: '192.168.2.0/25'
+        routeTableid: devroutetable.outputs.routeTableid
+      }
+      {
+        name: 'PE-subnet'
+        subnetPrefix: '192.168.2.224/27'
+        routeTableid: ''
+      }
+    ]
+    
   }
 }
 // Peer hub with aks vnets
@@ -179,7 +195,7 @@ module akscluster './modules/aks-cluster.bicep' = {
   params: {
     tags: tags
     clusterName: clusterName
-    subnetID: aksvnet.outputs.subnet1ID
+    subnetID: aksvnet.outputs.subnet[0].subnetID
     nodeResourceGroup: '${clusterName}-nodes-rg' 
   }
 }
@@ -221,7 +237,7 @@ module agentvm './modules/ubuntu-docker.bicep' = {
     location: location
     adminUsername: 'adminuser'
     adminPasswordOrKey: adminPasswordOrKey
-    subnetID: devvnet.outputs.subnet1ID
+    subnetID: devvnet.outputs.subnet[0].subnetID
     authenticationType: 'password'
   }
 }

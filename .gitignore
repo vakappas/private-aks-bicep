@@ -1,2 +1,2 @@
-# Ignore .txt files
+# ignore files containing secrets
 *.txt
