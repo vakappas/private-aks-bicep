@@ -72,6 +72,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2020-09-01' = {
         enableAutoScaling: false
         vnetSubnetID: subnetID
       }
+
     ]
     apiServerAccessProfile:{
       enablePrivateCluster:true
