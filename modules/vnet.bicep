@@ -6,16 +6,19 @@ param subnets array = [
     name: 'subnet1'
     subnetPrefix: '172.16.0.0/24'
     routeTableid: ''
+    privateEndpointNetworkPolicies: 'Disabled'
   }
   {
     name: 'subnet2'
     subnetPrefix: '172.16.1.0/24'
     routeTableid: ''
+    privateEndpointNetworkPolicies: 'Disabled'
   }
   {
     name: 'subnet3'
     subnetPrefix: '172.16.2.0/24'
     routeTableid: ''
+    privateEndpointNetworkPolicies: 'Disabled'
   }
 ]
 param tags object = {
@@ -40,6 +43,7 @@ resource vnet 'Microsoft.Network/virtualNetworks@2019-12-01' = {
       name:subnet.name
       properties:{
         addressPrefix:subnet.subnetPrefix
+        privateEndpointNetworkPolicies: subnet.privateEndpointNetworkPolicies
         routeTable: empty(subnet.routeTableid)? json('null') : {
           id: subnet.routeTableid
         }

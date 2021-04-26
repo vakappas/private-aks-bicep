@@ -29,6 +29,9 @@ param bastionHostName string = 'hub-bastion'
 // AKS cluster name
 param clusterName string = 'aks-cl01'
 
+// ACR Name
+param acrNamePrefix string = '${prefix}'
+
 // Admin user's password or SSH public key
 param adminPasswordOrKey string
 
@@ -39,17 +42,17 @@ var tags = {
 }
 
 // create resource groups
-resource hubrg 'Microsoft.Resources/resourceGroups@2020-06-01'={
+resource hubrg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '${prefix}-hub-rg'
   location: location
   tags: tags
 }
-resource aksrg 'Microsoft.Resources/resourceGroups@2020-06-01'={
+resource aksrg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '${prefix}-aks-rg'
   location: location
   tags: tags
 }
-resource devrg 'Microsoft.Resources/resourceGroups@2020-06-01'={
+resource devrg 'Microsoft.Resources/resourceGroups@2020-06-01' = {
   name: '${prefix}-dev-rg'
   location: location
   tags: tags
@@ -79,14 +82,15 @@ module aksvnet './modules/vnet.bicep' = {
         name: 'nodes-subnet'
         subnetPrefix: '192.168.4.0/23'
         routeTableid: aksroutetable.outputs.routeTableid
+        privateEndpointNetworkPolicies: 'Disabled'
       }
       {
         name: 'ingress-subnet'
         subnetPrefix: '192.168.6.0/24'
         routeTableid: ''
+        privateEndpointNetworkPolicies: 'Enabled'
       }
     ]
-
   }
 }
 // Create the dev vnet
@@ -101,14 +105,15 @@ module devvnet './modules/vnet.bicep' = {
         name: 'agents-subnet'
         subnetPrefix: '192.168.2.0/25'
         routeTableid: devroutetable.outputs.routeTableid
+        privateEndpointNetworkPolicies: 'Enabled'
       }
       {
         name: 'PE-subnet'
         subnetPrefix: '192.168.2.224/27'
         routeTableid: ''
+        privateEndpointNetworkPolicies: 'Disabled'
       }
     ]
-    
   }
 }
 // Peer hub with aks vnets
@@ -117,9 +122,9 @@ module hubtoakspeering './modules/vnet-peering.bicep' = {
   scope: resourceGroup(hubrg.name)
   dependsOn: [
     hubvnet
-    aksvnet    
+    aksvnet
   ]
-  params:{
+  params: {
     localVnetName: hubvnet.name
     remoteVnetName: aksvnet.name
     remoteVnetRg: aksrg.name
@@ -131,9 +136,9 @@ module akstohubpeering './modules/vnet-peering.bicep' = {
   scope: resourceGroup(aksrg.name)
   dependsOn: [
     hubvnet
-    aksvnet    
+    aksvnet
   ]
-  params:{
+  params: {
     localVnetName: aksvnet.name
     remoteVnetName: hubvnet.name
     remoteVnetRg: hubrg.name
@@ -146,9 +151,9 @@ module hubtodevpeering './modules/vnet-peering.bicep' = {
   scope: resourceGroup(hubrg.name)
   dependsOn: [
     hubvnet
-    devvnet    
+    devvnet
   ]
-  params:{
+  params: {
     localVnetName: hubvnet.name
     remoteVnetName: devvnet.name
     remoteVnetRg: devrg.name
@@ -160,9 +165,9 @@ module devtohubpeering './modules/vnet-peering.bicep' = {
   scope: resourceGroup(devrg.name)
   dependsOn: [
     hubvnet
-    devvnet    
+    devvnet
   ]
-  params:{
+  params: {
     localVnetName: devvnet.name
     remoteVnetName: hubvnet.name
     remoteVnetRg: hubrg.name
@@ -170,19 +175,19 @@ module devtohubpeering './modules/vnet-peering.bicep' = {
   }
 }
 // Create & assign the route tables
-module aksroutetable './modules/routetable.bicep'={
+module aksroutetable './modules/routetable.bicep' = {
   name: 'aks-rt'
   scope: resourceGroup(aksrg.name)
-  params:{
+  params: {
     udrName: 'aks-rt'
     udrRouteName: 'Default-route'
     nextHopIpAddress: hubvnet.outputs.hubFwPrivateIPAddress
   }
 }
-module devroutetable './modules/routetable.bicep'={
+module devroutetable './modules/routetable.bicep' = {
   name: 'dev-rt'
   scope: resourceGroup(devrg.name)
-  params:{
+  params: {
     udrName: 'dev-rt'
     udrRouteName: 'Default-route'
     nextHopIpAddress: hubvnet.outputs.hubFwPrivateIPAddress
@@ -196,7 +201,7 @@ module akscluster './modules/aks-cluster.bicep' = {
     tags: tags
     clusterName: clusterName
     subnetID: aksvnet.outputs.subnet[0].subnetID
-    nodeResourceGroup: '${clusterName}-nodes-rg' 
+    nodeResourceGroup: '${clusterName}-nodes-rg'
   }
 }
 // Link the private DNS zone of AKS to hub & dev vnets
@@ -207,13 +212,12 @@ module privatednshublink './modules/private-dns-vnet-link.bicep' = {
   ]
   scope: resourceGroup('${clusterName}-nodes-rg')
   params: {
-    location: location
-    privatednszonename: akscluster.outputs.apiServerAddress
+    privatednsfqdn: akscluster.outputs.apiServerAddress
     registrationEnabled: false
     vnetID: hubvnet.outputs.hubVnetId
     vnetName: hubvnet.name
   }
-} 
+}
 module privatednsdevlink './modules/private-dns-vnet-link.bicep' = {
   name: 'link-to-dev-vnet'
   dependsOn: [
@@ -221,8 +225,7 @@ module privatednsdevlink './modules/private-dns-vnet-link.bicep' = {
   ]
   scope: resourceGroup('${clusterName}-nodes-rg')
   params: {
-    location: location
-    privatednszonename: akscluster.outputs.apiServerAddress
+    privatednsfqdn: akscluster.outputs.apiServerAddress
     registrationEnabled: false
     vnetID: devvnet.outputs.vnetID
     vnetName: devvnet.name
@@ -239,5 +242,17 @@ module agentvm './modules/ubuntu-docker.bicep' = {
     adminPasswordOrKey: adminPasswordOrKey
     subnetID: devvnet.outputs.subnet[0].subnetID
     authenticationType: 'password'
+  }
+}
+// Creat an Azure container registry with Private Link
+module privateacr 'modules/acr.bicep' = {
+  name: '${prefix}-acr'
+  scope: resourceGroup(aksrg.name)
+  params:{
+    prefix:acrNamePrefix
+    acrSku: 'Premium'
+    acrVnetName: 'aks-vnet'
+    acrVnetID: aksvnet.outputs.vnetID
+    acrSubnetID: aksvnet.outputs.subnet[0].subnetID
   }
 }
