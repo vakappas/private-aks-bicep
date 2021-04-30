@@ -232,7 +232,7 @@ module privatednsdevlink './modules/private-dns-vnet-link.bicep' = {
   }
 }
 // Create a jumpbox VM, ubuntu OS with docker
-module agentvm './modules/ubuntu-docker.bicep' = {
+module agentvm './modules/custom-agent-vm.bicep' = {
   name: '${prefix}-vm'
   scope: resourceGroup(devrg.name)
   params: {
@@ -242,6 +242,7 @@ module agentvm './modules/ubuntu-docker.bicep' = {
     adminPasswordOrKey: adminPasswordOrKey
     subnetID: devvnet.outputs.subnet[0].subnetID
     authenticationType: 'password'
+    vmExtensionCustomScriptUri: 
   }
 }
 // Creat an Azure container registry with Private Link

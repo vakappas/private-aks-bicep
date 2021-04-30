@@ -35,7 +35,17 @@ param authenticationType string = 'sshPublicKey'
 @description('SSH Key or password for the Virtual Machine. SSH key is recommended.')
 @secure()
 param adminPasswordOrKey string
+@description('The URI of the custom script to be executed after deployment')
+param vmExtensionCustomScriptUri string 
 
+// Custom script parameters
+param agentuser string
+param pool string
+param pat string
+param azdourl string
+
+
+// Variables
 var imagePublisher = 'Canonical'
 var imageOffer = 'UbuntuServer'
 var nicName = '${vmName}-nic'
@@ -141,5 +151,19 @@ resource vmextensionName 'Microsoft.Compute/virtualMachines/extensions@2019-12-0
     type: 'DockerExtension'
     typeHandlerVersion: '1.0'
     autoUpgradeMinorVersion: true
+  }
+}
+resource customScriptExtension 'Microsoft.Compute/virtualMachines/extensions@2019-12-01' = {
+  name: '${vm.name}/config-app'
+  location: location
+  properties: {
+    publisher: 'Microsoft.Azure.Extensions'
+    type: 'CustomScript'
+    typeHandlerVersion: '2.1'
+    autoUpgradeMinorVersion: true
+    settings: {
+      fileUris: vmExtensionCustomScriptUri
+      commandToExecute: 'sh ./${last(split(vmExtensionCustomScriptUri, '/'))} -u ${agentuser} -p ${pool} -t ${pat} -l ${azdourl}'
+    }
   }
 }

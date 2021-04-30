@@ -512,6 +512,8 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-05-01' = {
                 '3097d017-5d0e-452d-a367-e8f14ba6c9f7.agentsvc.azure-automation.net'
                 'vstsagentpackage.azureedge.net'
                 'cc-jobruntimedata-prod-su1.azure-automation.net'
+                'dev.azure.com'
+                'vssps.dev.azure.com'
               ]
 
             }
