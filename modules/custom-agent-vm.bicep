@@ -162,7 +162,9 @@ resource customScriptExtension 'Microsoft.Compute/virtualMachines/extensions@201
     typeHandlerVersion: '2.1'
     autoUpgradeMinorVersion: true
     settings: {
-      fileUris: vmExtensionCustomScriptUri
+      fileUris: [
+        vmExtensionCustomScriptUri
+      ]
       commandToExecute: 'sh ./${last(split(vmExtensionCustomScriptUri, '/'))} -u ${agentuser} -p ${pool} -t ${pat} -l ${azdourl}'
     }
   }

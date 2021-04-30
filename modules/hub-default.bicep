@@ -690,6 +690,7 @@ resource hubFw 'Microsoft.Network/azureFirewalls@2020-05-01' = {
                 '*.s3.amazonaws.com'
                 '*.github.io'
                 'github-releases.githubusercontent.com'
+                'raw.githubusercontent.com'
               ]
 
             }

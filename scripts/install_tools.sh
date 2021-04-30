@@ -3,7 +3,7 @@
 while getopts ":u:p:t:l:" arg; do
     case "${arg}" in
         u)
-            agentuser==${OPTARG}
+            agentuser=${OPTARG}
         ;;
         p)
             pool=${OPTARG}
