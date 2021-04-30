@@ -65,7 +65,7 @@ echo "Configure Azure DevOps agent ..." >> $log
 sudo chown -R $agentuser /opt/azdo
 sudo chmod -R 755 /opt/azdo
 # runuser -l $agentuser -c "/opt/azdo/config.sh --unattended --url $azdourl --auth pat --token $pat --pool $pool --acceptTeeEula"
-/opt/azdo/config.sh --unattended --url $azdourl --auth pat --token $pat --pool $pool --acceptTeeEula
+runuser -l $agentuser -c "/opt/azdo/config.sh --unattended --url $azdourl --auth pat --token $pat --pool $pool --acceptTeeEula"
 
 # install and start the service
 echo "Configure Azure DevOps agent to run as a service ..." >> $log
