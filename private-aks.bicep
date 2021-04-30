@@ -35,6 +35,9 @@ param acrNamePrefix string = '${prefix}'
 // Admin user's password or SSH public key
 param adminPasswordOrKey string
 
+// PAT needed to join agent pool
+param customAgentPat string
+
 // Variables
 var tags = {
   environment: 'test'
@@ -242,7 +245,11 @@ module agentvm './modules/custom-agent-vm.bicep' = {
     adminPasswordOrKey: adminPasswordOrKey
     subnetID: devvnet.outputs.subnet[0].subnetID
     authenticationType: 'password'
-    vmExtensionCustomScriptUri: 
+    vmExtensionCustomScriptUri: 'https://raw.githubusercontent.com/vakappas/private-aks-bicep/dev/scripts/install_tools.sh'
+    agentuser: 'adminuser'
+    azdourl: 'https://dev.azure.com/vakappas'
+    pool: 'private-AKS-agent-pool'
+    pat: customAgentPat
   }
 }
 // Creat an Azure container registry with Private Link
