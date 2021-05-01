@@ -28,19 +28,7 @@ date >> $log
 echo "Install Azure CLI ..." >> $log
 curl -sL https://aka.ms/InstallAzureCLIDeb | sudo bash
 
-# install docker
-# sudo apt install -y apt-transport-https ca-certificates curl software-properties-common
-# curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-# sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu bionic stable"
-# sudo apt update
-# sudo apt install -y docker-ce
-# sudo usermod -aG docker $agentuser
-
 # install kubectl
-# curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add
-# sudo apt-add-repository "deb http://apt.kubernetes.io/ kubernetes-xenial main"
-# sudo apt update
-# sudo apt-get install -y kubectl
 echo "Install kubectl ..." >> $log
 sudo az aks install-cli
 
@@ -64,7 +52,6 @@ sudo rm -f azdoagent.tar.gz
 echo "Configure Azure DevOps agent ..." >> $log
 sudo chown -R $agentuser /opt/azdo
 sudo chmod -R 755 /opt/azdo
-# runuser -l $agentuser -c "/opt/azdo/config.sh --unattended --url $azdourl --auth pat --token $pat --pool $pool --acceptTeeEula"
 runuser -l $agentuser -c "/opt/azdo/config.sh --unattended --url $azdourl --auth pat --token $pat --pool $pool --acceptTeeEula"
 
 # install and start the service
