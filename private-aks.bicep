@@ -252,7 +252,7 @@ module agentvm './modules/custom-agent-vm.bicep' = {
     pat: customAgentPat
   }
 }
-// Creat an Azure container registry with Private Link
+// Create an Azure container registry with Private Link
 module privateacr 'modules/acr.bicep' = {
   name: '${prefix}-acr'
   scope: resourceGroup(aksrg.name)
@@ -263,4 +263,17 @@ module privateacr 'modules/acr.bicep' = {
     acrVnetID: aksvnet.outputs.vnetID
     acrSubnetID: aksvnet.outputs.subnet[0].subnetID
   }
+}
+
+// Create an Azure Keyvault with Private Link
+module privatekeyvault 'modules/keyvault.bicep' = {
+  scope: resourceGroup(aksrg.name)
+  name: '${prefix}-vault'
+  params: {
+    keyVaultName: '${prefix}-vault'
+    objectId: 'c176481e-4333-4b68-82b3-ae8d97e4b2af'
+    vaultSubnetID: aksvnet.outputs.subnet[0].subnetID
+    vaultVnetID: aksvnet.outputs.vnetID
+    vaultVnetName: aksvnet.name
+  }  
 }
