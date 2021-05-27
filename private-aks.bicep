@@ -90,7 +90,6 @@ module aksvnet './modules/vnet.bicep' = {
       {
         name: 'ingress-subnet'
         subnetPrefix: '192.168.6.0/24'
-        routeTableid: ''
         privateEndpointNetworkPolicies: 'Enabled'
       }
     ]
@@ -113,7 +112,6 @@ module devvnet './modules/vnet.bicep' = {
       {
         name: 'PE-subnet'
         subnetPrefix: '192.168.2.224/27'
-        routeTableid: ''
         privateEndpointNetworkPolicies: 'Disabled'
       }
     ]
