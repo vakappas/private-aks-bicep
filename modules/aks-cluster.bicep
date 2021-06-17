@@ -21,7 +21,7 @@ param workerNodeVMSize string = 'Standard_D2s_v3'
 param subnetID string
 
 // The Kubernetes version
-param kubeVersion string = '1.19.7'
+
 
 // The nodes resource group name
 param nodeResourceGroup string = '${dnsPrefix}-${clusterName}-rg'
@@ -61,7 +61,6 @@ resource aks 'Microsoft.ContainerService/managedClusters@2020-09-01' = {
     type: 'SystemAssigned'
   }
   properties: {
-    kubernetesVersion: kubeVersion
     enableRBAC: true
     dnsPrefix: dnsPrefix
     agentPoolProfiles: [
@@ -114,3 +113,4 @@ resource aks 'Microsoft.ContainerService/managedClusters@2020-09-01' = {
 output aksid string = aks.id
 output apiServerAddress string = aks.properties.privateFQDN
 output aksnodesrg string = aks.properties.nodeResourceGroup
+output aksclientid string = aks.properties.servicePrincipalProfile.clientId

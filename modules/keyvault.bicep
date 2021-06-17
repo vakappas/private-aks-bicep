@@ -36,11 +36,9 @@ param secretsPermissions array = [
 @description('Specifies whether the key vault is a standard vault or a premium vault.')
 param skuName string = 'standard'
 
-@secure()
 @description('Specifies all secrets {"secretName":"","secretValue":""} wrapped in a secure object.')
-param secretsObject object = {
-  secrets: []
-}
+param secretsArray array = []
+
 @description('Vault VNET Name')
 param vaultVnetName string
 
@@ -84,12 +82,12 @@ resource vault 'Microsoft.KeyVault/vaults@2019-09-01' = {
 }
 
 // Create any given secrets
-//resource secrets 'Microsoft.KeyVault/vaults/secrets@2018-02-14' = [for secret in secretsObject.secrets: {
-//  name: '${vault.name}/${secret.secretName}'
-//  properties: {
-//    value: secret.secretValue
-//  }
-//}]
+// resource secrets 'Microsoft.KeyVault/vaults/secrets@2018-02-14' = [for secret in secretsArray: {
+//   name: '${vault.name}/${secret.secretName}'
+//   properties: {
+//     value: secret.secretValue
+//   }
+// }]
 
 // Private DNS Zone
 module vaultPrivateDNSZone 'private-DNS-Zone.bicep' = {

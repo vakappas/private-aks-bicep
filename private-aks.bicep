@@ -32,11 +32,17 @@ param clusterName string = 'aks-cl01'
 // ACR Name
 param acrNamePrefix string = '${prefix}'
 
-// Admin user's password or SSH public key
-param adminPasswordOrKey string
+// Custom Agent Section
+param customAgentConfig object = {
+  adminPasswordOrKey: ''
+  customAgentPat:''
+}
 
-// PAT needed to join agent pool
-param customAgentPat string
+// // Admin user's password or SSH public key
+// param adminPasswordOrKey string
+
+// // PAT needed to join agent pool
+// param customAgentPat string
 
 // Variables
 var tags = {
@@ -233,21 +239,21 @@ module privatednsdevlink './modules/private-dns-vnet-link.bicep' = {
   }
 }
 // Create a jumpbox VM, ubuntu OS with docker
-module agentvm './modules/custom-agent-vm.bicep' = {
+module agentvm './modules/custom-agent-vm.bicep' = if (!empty (customAgentConfig.adminPasswordOrKey)) {
   name: '${prefix}-vm'
   scope: resourceGroup(devrg.name)
   params: {
     vmName: '${prefix}-vm'
     location: location
     adminUsername: 'adminuser'
-    adminPasswordOrKey: adminPasswordOrKey
+    adminPasswordOrKey: customAgentConfig.adminPasswordOrKey
     subnetID: devvnet.outputs.subnet[0].subnetID
     authenticationType: 'password'
     vmExtensionCustomScriptUri: 'https://raw.githubusercontent.com/vakappas/private-aks-bicep/dev/scripts/install_tools.sh'
     agentuser: 'adminuser'
     azdourl: 'https://dev.azure.com/vakappas'
     pool: 'private-AKS-agent-pool'
-    pat: customAgentPat
+    pat: customAgentConfig.customAgentPat
   }
 }
 // Create an Azure container registry with Private Link
