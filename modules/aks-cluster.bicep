@@ -17,10 +17,8 @@ param workerNodeCount int = 1
 param systemNodeVMSize string = 'Standard_D2s_v3'
 param workerNodeVMSize string = 'Standard_D2s_v3'
 
-// The nodes' subnet ID
+// The nodes' VNET & subnet ID
 param subnetID string
-
-// The Kubernetes version
 
 
 // The nodes resource group name
@@ -34,7 +32,6 @@ param tags object = {
 // vars
 var systemNodePoolName = 'systempool'
 var workerNodePoolName = 'workerpool'
-
 var aksLawsName = '${resourceGroup().name}-laws-${uniqueString(resourceGroup().id)}'
 
 // resources
@@ -52,13 +49,22 @@ resource aks_workspace 'Microsoft.OperationalInsights/workspaces@2020-08-01' = {
   }
 }
 
+// Create AKS MAnaged Identity
+resource aksUserDefinedManagedIdentity 'Microsoft.ManagedIdentity/userAssignedIdentities@2018-11-30' = {
+  name: '${clusterName}-mi'
+  location: resourceGroup().location  
+}
+
 // Create the Azure kubernetes service cluster
 resource aks 'Microsoft.ContainerService/managedClusters@2020-09-01' = {
   name: clusterName
   location: location
   tags: tags
   identity: {
-    type: 'SystemAssigned'
+    type: 'UserAssigned'
+    userAssignedIdentities: {
+      '${aksUserDefinedManagedIdentity.id}' : {}
+    }
   }
   properties: {
     enableRBAC: true
@@ -98,6 +104,7 @@ resource aks 'Microsoft.ContainerService/managedClusters@2020-09-01' = {
     networkProfile: {
       networkPlugin: 'azure'
       loadBalancerSku: 'standard'
+      outboundType: 'userDefinedRouting'
     }
     addonProfiles: {
       omsagent: {
